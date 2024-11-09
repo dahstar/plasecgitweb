@@ -1,0 +1,5 @@
+cohere
+tiktoken
+metisai
+python-telegram-bot
+telebot
