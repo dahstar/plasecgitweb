@@ -1,4 +1,3 @@
-cohere
 tiktoken
 metisai
 python-telegram-bot
