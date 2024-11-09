@@ -12,7 +12,6 @@ ADD ./requirements.txt ./
 RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/
 ADD ./ ./
 
-ENTRYPOINT ["/bin/sh", "-c" , "python app.py  i"]
 
 ENTRYPOINT ["/bin/sh", "-c" , "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 django_app.wsgi"]
 
