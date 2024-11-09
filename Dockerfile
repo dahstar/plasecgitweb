@@ -9,7 +9,7 @@ WORKDIR /django_app/
 ADD ./requirements.txt ./
 
 
-RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/
+RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && pip install --upgrade pysqlite && pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/
 ADD ./ ./
 
 
