@@ -1,5 +1,8 @@
 FROM python:3.10-slim-buster
-
+# Install dependencies, including the latest SQLite
+RUN apt-get update && \
+    apt-get install -y sqlite3 libsqlite3-dev build-essential && \
+    rm -rf /var/lib/apt/lists/*
 LABEL maintainer="admin@playandsecure.com"
 
 ENV PYTHONUNBUFFERED=1
