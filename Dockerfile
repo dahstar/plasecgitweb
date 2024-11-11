@@ -16,7 +16,7 @@ COPY ./ .
 RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && \
     pip3 install pydantic && \
     pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/ && \
-    apt-get update && apt-get install -y supervisor
+    sudo apt install gunicorn && apt-get update && apt-get install -y supervisor
 
 COPY supervisord.conf /
 
