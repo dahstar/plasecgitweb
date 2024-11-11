@@ -27,7 +27,7 @@ import PlasecImage
 
 # Initialize Telegram bot with your API Token
 # Initialize bot with token (set your own token)
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN_BETA")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 bot.set_webhook()
