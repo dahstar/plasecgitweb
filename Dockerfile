@@ -20,4 +20,4 @@ RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ &
 
 COPY supervisord.conf /
 
-CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+ENTRYPOINT ["/bin/bash", "-c", "python app.py & gunicorn --bind 0.0.0.0:8000 django_app.wsgi"]
