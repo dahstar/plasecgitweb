@@ -15,7 +15,7 @@ from requests.exceptions import ConnectionError
 import random
 import urllib.request
 allm=None
-USER_DB_PATH="profile.db"
+USER_DB_PATH="profile1.db"
 # Dictionary to track each user's current autopilot step
 user_progress = {}
 
@@ -125,7 +125,7 @@ def find_user_id(username):
         print(f"Error finding user ID for {username}: {str(e)}")
         return None
 def check_user_in_db(user_id):
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     
     # Check if the user ID exists in the chat_history table
@@ -157,7 +157,7 @@ def send_message_to_user(username, message):
 
  
 def check_user_in_db(user_id):
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     
     # Check if the user ID exists in the chat_history table
@@ -180,7 +180,7 @@ def make_request_with_retry(url, max_retries=3):
 
 # Function to initialize the SQLite database
 def get_last_id():
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
 
     # Fetch the last id from the chat_history table
@@ -192,7 +192,7 @@ def get_last_id():
     # If no records are found, start from 0
     return result[0] if result[0] is not None else 0
 def initialize_db_profile():
-    conn = sqlite3.connect('profile.db')
+    conn = sqlite3.connect('profile1.db')
     cursor = conn.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS user_autopilot (
@@ -233,7 +233,7 @@ def get_autopilot_status(user_id):
 
 
 def initialize_db():
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_history (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -266,7 +266,7 @@ def handle_register(message):
     welcome_message = f"Hello, @{username}! Your User ID is {user_id}."
     bot.reply_to(message, welcome_message)
 def get_user_score(user_id):
-    conn = sqlite3.connect('profile.db')
+    conn = sqlite3.connect('profile1.db')
     cursor = conn.cursor()
 
     # Check if the user exists in the database
@@ -278,7 +278,7 @@ def get_user_score(user_id):
     conn.close()
     return result[0]  # Return the user's current score
 def get_or_create_user_profile(user_id):
-    conn = sqlite3.connect('profile.db')
+    conn = sqlite3.connect('profile1.db')
     cursor = conn.cursor()
 
     # Check if the user exists in the database
@@ -296,7 +296,7 @@ def get_or_create_user_profile(user_id):
 
 # Function to update user credits
 def update_user_credits(user_id, credits_to_add):
-    conn = sqlite3.connect('profile.db')
+    conn = sqlite3.connect('profile1.db')
     cursor = conn.cursor()
 
     # Update the credits for the user
@@ -318,7 +318,7 @@ def show_message_with_credits_button(chat_id, message_text, user_id, credits_add
     
 # Function to retrieve user credits
 def get_user_credits(user_id):
-    conn = sqlite3.connect('profile.db')
+    conn = sqlite3.connect('profile1.db')
     cursor = conn.cursor()
     cursor.execute('SELECT credits FROM user_profiles WHERE user_id = ?', (user_id,))
     result = cursor.fetchone()
@@ -327,7 +327,7 @@ def get_user_credits(user_id):
     return result[0] if result else 0
     
 def get_user_id_by_token(token):  
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     cursor.execute('SELECT user_id FROM chat_history WHERE token = ?', (token,))
     result = cursor.fetchone()
@@ -351,14 +351,14 @@ def get_message_credits(message=""):
      
 # Function to retrieve user credits
 def get_message_token(chat_id):
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     cursor.execute('SELECT token FROM chat_history WHERE chat_id = ?', (chat_id,))
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else 0
 def get_username_userid(chat_id):
-    conn = sqlite3.connect('profile.db')
+    conn = sqlite3.connect('profile1.db')
     cursor = conn.cursor()
     cursor.execute('SELECT user_name FROM user_profiles WHERE user_id = ?', (chat_id,))
     result = cursor.fetchone()
@@ -366,7 +366,7 @@ def get_username_userid(chat_id):
     return result[0] if result else 0
 # Function to store a message in the database
 def store_message(message, response, default_type='default_type', default_system='default_system', user_id=0, chat_id=0, token="0"):
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     
     # Fetch the last id and increment it
@@ -382,7 +382,7 @@ def store_message(message, response, default_type='default_type', default_system
 
 # Function to retrieve the chat history for a user
 def get_chat_history(user_id):
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     cursor.execute('SELECT message, response FROM chat_history WHERE user_id = ?', (user_id,))
     history = cursor.fetchall()
@@ -392,7 +392,7 @@ def get_chat_history(user_id):
 # Function to search history based on a partial input
 def search_history(user_id, search_term):
     search_term=search_term.replace("/search","").strip()
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     cursor.execute('SELECT message, response,token FROM chat_history WHERE user_id = ? AND message LIKE ?', 
                    (user_id, f'%{search_term}%'))
@@ -568,7 +568,7 @@ def real_time_search(message, task_type='search'):
         handle_chat(message, user_id)
 def get_message_token(message,response):
   
-    conn = sqlite3.connect('train.db')
+    conn = sqlite3.connect('train1.db')
     cursor = conn.cursor()
     
     # Use both chat_id and user_id to filter the result
