@@ -1,4 +1,3 @@
-#modifeid ai and chatgpt with my inputs
 import os
 import sqlite3
 import telebot
@@ -7,9 +6,115 @@ from plasec import Plasec
 user_id=0
 plasec_instance =None
 token=""
+user_scores = {}
+user_name=""
+score=100
 import time
 import requests
 from requests.exceptions import ConnectionError
+import random
+import urllib.request
+allm=None
+USER_DB_PATH="profile.db"
+# Dictionary to track each user's current autopilot step
+user_progress = {}
+
+user_modes = {}
+user_search_results = {}
+
+username=""
+import PlasecImage
+
+# Initialize Telegram bot with your API Token
+# Initialize bot with token (set your own token)
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+bot = telebot.TeleBot(TOKEN)
+
+bot.set_webhook()
+allscore=0
+
+@bot.message_handler(commands=['autopilot'])
+def start_autopilot(message):
+    global user_id
+   
+    set_autopilot_status(user_id, 1,1)
+
+ 
+    bot.reply_to(message, "با /play برای گرفتن کردیت اضافه بازی کنید 🎮 یا با /exit خارج شوید.")
+''''
+
+ 
+def chat_command(message):
+    user_id = message.from_user.id
+    # Check if the user is on the "chat" step
+    if user_progress.get(user_id) == "chat":
+       
+        chat_command(message)
+        user_progress[user_id] = "score"  # Move to the final step
+
+@bot.message_handler(commands=['score'])
+def score_command(message):
+    user_id = message.from_user.id
+    # Check if the user is on the "score" step
+    if user_progress.get(user_id) == "score":
+        get_user_score(user_id)
+        bot.reply_to(message, "پایان! شما همه مراحل را کامل کردید. 🎉")
+        user_progress.pop(user_id)  # Clear progress after completion
+'''
+@bot.message_handler(commands=['exit'])
+def exit_autopilot(message):
+    user_id = message.from_user.id
+    # End the autopilot session
+    if user_id in user_progress:
+        bot.reply_to(message, "  بزنید تا  اتوپایلوت خاتمه یابد/exit  ")
+
+def add_user_if_not_exists(user_id, username,score=10):
+    """Adds a user to the database if they don't already exist."""
+    conn = sqlite3.connect(USER_DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("INSERT OR IGNORE INTO users (user_id, username,score) VALUES (?, ? ,?)", (user_id, username,score))
+    conn.commit()
+    conn.close()
+def update_user_score(user_id, points=1):
+    """Increment the user's score by a given number of points."""
+    conn = sqlite3.connect(USER_DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE users SET score = score + ? WHERE user_id = ?", (points, user_id))
+    conn.commit()
+    conn.close()
+
+def deduct_credits(user_id, amount=10):
+    """Deduct credits from the user upon each interaction."""
+    print(f"deduct from {user_id}")
+    conn = sqlite3.connect(USER_DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT credits FROM users WHERE user_id = ?", (user_id,))
+    current_credits = cursor.fetchone()
+    
+    if current_credits and current_credits[0] >= amount:
+        cursor.execute("UPDATE users SET credits = credits - ? WHERE user_id = ?", (amount, user_id))
+        conn.commit()
+    conn.close()
+
+def deduct_score(user_id, amount=10):
+ try:
+    """Deduct credits from the user upon each interaction."""
+    print(f"deduct score from {user_id}")
+    conn = sqlite3.connect(USER_DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT score FROM users WHERE user_id = ?", (user_id,))
+    current_credits = cursor.fetchone()
+    
+    if current_credits and current_credits[0] >= amount:
+        cursor.execute("UPDATE users SET score = score - ? WHERE user_id = ?", (amount, user_id))
+        conn.commit()
+    conn.close()
+ except Exception as e:
+       return f"error:{str(e)}"
 
 def find_user_id(username):
     try:
@@ -70,20 +175,9 @@ def make_request_with_retry(url, max_retries=3):
             print(f"Connection error: {e}, retrying... ({attempt + 1}/{max_retries})")
             time.sleep(2)  # Wait before retrying
     raise ConnectionError("Max retries reached")
-#https://www.google.com/search?q=token+generator+python&oq=token+generator+pyth&gs_lcrp=EgZjaHJvbWUqBwgBEAAYgAQyBggAEEUYOTIHCAEQABiABDIICAIQABgWGB4yCAgDEAAYFhgeMggIBBAAGBYYHjIICAUQABgWGB4yCggGEAAYDxgWGB4yDAgHEAAYChgPGBYYHjINCAgQABiGAxiABBiKBTIKCAkQABiABBiiBNIBCTEwNTI2ajBqN6gCCLACAQ&sourceid=chrome&ie=UTF-8
-#gemeni
- 
-user_modes = {}
-user_search_results = {}
-
  
  
 
-# Initialize Telegram bot with your API Token
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN_BETA')
-bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
-bot.set_webhook()
-allscore=0
 # Function to initialize the SQLite database
 def get_last_id():
     conn = sqlite3.connect('train.db')
@@ -97,6 +191,47 @@ def get_last_id():
 
     # If no records are found, start from 0
     return result[0] if result[0] is not None else 0
+def initialize_db_profile():
+    conn = sqlite3.connect('profile.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS user_autopilot (
+        user_id INTEGER PRIMARY KEY,
+        autopilot INTEGER DEFAULT 0
+    )
+    ''')
+    
+    conn.commit()
+    conn.close() 
+def set_autopilot_status(user_id, status,current):
+    # Connect to the database
+    conn = sqlite3.connect(USER_DB_PATH)
+    cursor = conn.cursor()
+
+    # Insert or update the autopilot status for the user
+    cursor.execute('''
+    INSERT INTO user_autopilot (user_id, autopilot,currentrun) 
+    VALUES (?, ?, ?)
+    ON CONFLICT(user_id) 
+    DO UPDATE SET autopilot=excluded.autopilot
+    ''', (user_id, status,current))
+    
+    conn.commit()
+    conn.close()
+def get_autopilot_status(user_id):
+
+    # Retrieve the autopilot status for a specific user
+    conn = sqlite3.connect(USER_DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT autopilot FROM user_autopilot WHERE user_id = ?', (user_id,))
+    result = cursor.fetchone()
+    
+    conn.close()
+    
+    return result[0] if result else 0  # Return 0 if no record found
+
+
 def initialize_db():
     conn = sqlite3.connect('train.db')
     cursor = conn.cursor()
@@ -115,6 +250,7 @@ def initialize_db():
                         user_id INTEGER PRIMARY KEY,
                         credits INTEGER DEFAULT 0
                       )''')
+    
     conn.commit()
     conn.close()
 @bot.message_handler(commands=['register'])
@@ -129,6 +265,18 @@ def handle_register(message):
     # Send a welcome message to the user
     welcome_message = f"Hello, @{username}! Your User ID is {user_id}."
     bot.reply_to(message, welcome_message)
+def get_user_score(user_id):
+    conn = sqlite3.connect('profile.db')
+    cursor = conn.cursor()
+
+    # Check if the user exists in the database
+    cursor.execute('SELECT score FROM users WHERE user_id = ?', (user_id,))
+    result = cursor.fetchone()
+    # If user does not exist, create a profile with 0 credits
+    if result is None:
+        return "you are not playing yet"
+    conn.close()
+    return result[0]  # Return the user's current score
 def get_or_create_user_profile(user_id):
     conn = sqlite3.connect('profile.db')
     cursor = conn.cursor()
@@ -139,7 +287,7 @@ def get_or_create_user_profile(user_id):
 
     # If user does not exist, create a profile with 0 credits
     if result is None:
-        cursor.execute('INSERT INTO user_profiles (user_id, credits) VALUES (?, ?)', (user_id, 0))
+        cursor.execute('INSERT INTO users (user_id, credits,score) VALUES (?, ?, ?)', (user_id, 10, 10))
         conn.commit()
         result = (0,)  # Default credits if the user is new
 
@@ -152,9 +300,10 @@ def update_user_credits(user_id, credits_to_add):
     cursor = conn.cursor()
 
     # Update the credits for the user
-    cursor.execute('UPDATE user_profiles SET credits = credits + ? WHERE user_id = ?', (credits_to_add, user_id))
+    cursor.execute('UPDATE users SET credits = credits + ? WHERE user_id = ?', (credits_to_add, user_id))
     conn.commit()
     conn.close()
+
 def show_message_with_credits_button(chat_id, message_text, user_id, credits_added=None):
     markup = InlineKeyboardMarkup()
 
@@ -185,6 +334,9 @@ def get_user_id_by_token(token):
     conn.close()
     return result[0] if result else 0
 def get_message_credits(message=""):
+    global score
+    if "💲" in message:
+      return f"you have {score} plasec now by playing add to them"
     if message=="":
        global plasec_instance
        return plasec_instance.get_price()
@@ -194,6 +346,7 @@ def get_message_credits(message=""):
      update_user_credits(user_id,float(mcredit)) 
      credit=get_user_credits(user_id)
      username=get_username_userid(user_id)
+    
      return str(credit)+"-message credit:"+message.split("-")[-1]+"-"+str(username)
      
 # Function to retrieve user credits
@@ -256,38 +409,41 @@ def show_colorful_menu(chat_id,message="Please choose an option:",crmessage="�
     markup = InlineKeyboardMarkup()
 
     # Create colorful buttons using emojis
-    start_chat_button = InlineKeyboardButton('🌟 /chat message]', callback_data='start_chat')
-    search_button = InlineKeyboardButton('🔍 /search [searchterm]', callback_data='search')
-    register_button = InlineKeyboardButton('🆘 /register', callback_data='handle_register')
-    help_button = InlineKeyboardButton('🆘 Help', callback_data='help')
-    credits_button = InlineKeyboardButton(crmessage, callback_data=crmessage)
-    exit_button = InlineKeyboardButton('❌ /Exit', callback_data='exit')
+    start_chat_button = InlineKeyboardButton('💬 /chat [message] use credits in chat', callback_data='start_chat')
+    search_button = InlineKeyboardButton('▶️ /play get chat in credits', callback_data='gameplay')
+    register_button = InlineKeyboardButton('📝 /share soon', callback_data='handle_register')
+    ref_button = InlineKeyboardButton('📝 /ref soon', callback_data='handle_register')
+    autopilot_button = InlineKeyboardButton('/autopilot', callback_data='autopilot')
+    credits_button = InlineKeyboardButton('💳 ' + crmessage, callback_data=crmessage)
+    exit_button = InlineKeyboardButton('❌ /exit', callback_data='exit')
     if crmessage=="💲 Credits":
      # Add buttons to the markup
      markup.row(start_chat_button, search_button)
-     markup.row(help_button, credits_button)
-     markup.row(register_button,exit_button)
+     markup.row(autopilot_button, credits_button)
+     markup.row(exit_button)
     else:
         markup.row( credits_button)
     # Send the message with the colorful menu
     s="dawood"
     if type(s)!=type(message):
      message=message.content_type
+     
     bot.send_message(chat_id, message, reply_markup=markup)
 # Handle the button press via callback data
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     
-    if call.data == "start_chat":
-        bot.send_message(call.message.chat.id, "Starting chat... How can I assist you today?")
-    elif call.data == "search":
-        bot.send_message(call.message.chat.id, "Please start typing to search.")
+     
+    if call.data == "gameplay":
+        bot.send_message(call.message.chat.id, " type /play for play or /score for score")
+    elif call.data == "autopilot":
+          start_autopilot(call.message)
     elif call.data=="get_search":
       
         user_modes[call.from_user.id] = "search"  # Switch to search mode
     elif call.data == "help":
         bot.send_message(call.message.chat.id, "Help Menu: Choose an option to start a chat or search for information.")
-    elif "$" in call.data :
+    elif "$" in call.data or "💲" in call.data :
         user_id = call.from_user.id
         bot.send_message(call.message.chat.id, f"all credits:{get_message_credits(call.data)}")
     elif call.data == "get_credits_message":
@@ -295,7 +451,7 @@ def callback_query(call):
         price=get_credits_message()
        
         bot.send_message(call.message.chat.id, f"message credits:{get_message_credits()}")
-
+    
     elif call.data == "exit":
         bot.send_message(call.message.chat.id, "Goodbye!")
 # Function to interact with Cohere for training examples
@@ -321,8 +477,22 @@ def chatwithllm(message, topic='default_topic', system='default_system'):
 # Handle the /start command
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "Hello, welcome to plasec!")
-    show_colorful_menu(message.chat.id,"Hello, welcome to plasec!")
+    global user_id
+    text=""
+    user_id=message.from_user.id
+   
+    text="به پلاسیک خوش آمدید"
+    text+="\\n"
+    text+="برای آموزش بازی کردن از اتوپایلوت استفاده کنید" 
+    text+="\\n"
+    text+="با بازی کردیت بگیرید و با هوش مصنوعی و در آینده دوستان چت کنید و کردیت را سهیم شوید و از امکانات هوش مصنوعی پیشرفته استفاده کنید "
+    text+="\\n"
+    text+="نسخه دمو تک نفره)"
+    text+="\\n"
+         
+    
+    
+    show_colorful_menu(message.chat.id,text)
 
 # Function to show search results in a numbered format with truncated messages (up to 100 characters)
 def display_search_results(chat_id, results):
@@ -346,32 +516,41 @@ def display_search_results(chat_id, results):
 
     #bot.send_message(chat_id, "Please choose an option:")
     return results,token
+ 
 def handle_chat(message):
-    global plasec_instance
-    user_message = message.text.replace("/chat ", "").strip()
-    user_id = message.from_user.id
+   chat_id = message.chat.id   
+   try: 
+    global plasec_instance,user_id
+    user_message = message.text.replace("/chat", "").strip()
+    if user_id==0:
+     user_id = message.from_user.id
     if user_message:
         # Create a Plasec instance
         plasec_instance = Plasec(chat=user_message, topic="general", system="telegram")
-        chat_id = message.chat.id  # Retrieve the chat_id
-        
+         # Retrieve the chat_id
+        #deduct_credits(user_id,10)
+        deduct_score(user_id,10)
         # Store the message, response, and chat_id in the database
         store_message(user_message, plasec_instance.answer, 'chat', 'plasec', user_id, chat_id, plasec_instance.token)
-
-        # Update user credits
-        update_user_credits(user_id, 1)
-
         # Show response and menu
         show_message_with_credits_button(message.chat.id, f"Plasec Response: {plasec_instance.answer}", user_id, credits_added=10)
         show_colorful_menu(message.chat.id, f"{plasec_instance.answer}", f"{plasec_instance.token}+plasec_instance.count$c")
-
-
-def real_time_search(message, user_id, task_type='search'):
+       
+   except Exception as e:
+           bot.send_message(chat_id, f"error{str(e)}")
+@bot.message_handler(commands=['chat'])
+def real_time_search(message, task_type='search'):
+    user_id = message.from_user.id
     search_term = message.text.strip().replace("/chat ", "")  # Extract the search term from the message
 
     # Perform a search based on the term
     results = search_history(user_id, search_term)
-
+    autostarted=get_autopilot_status(user_id)
+    print("auto",autostarted)
+    if autostarted==1:
+         bot.reply_to(message, "با /score کردیتتان را ببینید 📊 یا با /exit خارج شوید.")
+    if search_term=="/chat":
+        return
     if results:
         # If search results are found, display them and let the user choose
         user_search_results[user_id] = results
@@ -379,11 +558,13 @@ def real_time_search(message, user_id, task_type='search'):
         result,token=display_search_results(message.chat.id, results)
 
         # Auto-select the first result or let the user pick
-        
-        bot.register_next_step_handler(message, handle_search_selection, user_id)
+        if len(result)>1 :
+         bot.register_next_step_handler(message, handle_search_selection, user_id)
     else:
         # If no results are found, fall back to chat
-        bot.send_message(message.chat.id, "waiting for chat...")
+        global user_name
+        user_name=message.from_user.username
+        bot.send_message(message.chat.id, f"waiting for chat by {message.from_user.username}...")
         handle_chat(message, user_id)
 def get_message_token(message,response):
   
@@ -463,7 +644,10 @@ def handle_search_selection(message, user_id):
 # Function to handle chat if no search results are found
 def handle_chat(message, user_id):
     user_message = message.text.replace("/chat ", "").strip()
-
+    d=get_user_score(user_id)
+    if get_user_score(user_id)<10:
+        bot.send_message(user_id, f"your :{d} isn't enough for chat")
+        return
     if user_message:
         # Create a Plasec instance with chat, topic, and system parameters
         plasec_instance = Plasec(chat=user_message, topic="general", system="telegram")
@@ -471,12 +655,29 @@ def handle_chat(message, user_id):
         print("ch",user_id,chat_id)
         # Send the generated answer back to the user
         store_message(user_message, plasec_instance.answer, 'chat', 'plasec', user_id,chat_id,plasec_instance.token)
-        update_user_credits(user_id, 1)  # Add 1 credit for chatting
+        
+        deduct_score(user_id, 10)  # remove credit for chatting
  
-
+            
         show_message_with_credits_button(message.chat.id, f"Plasec Response: {plasec_instance.answer}", user_id, credits_added=10)
         
         show_colorful_menu(message.chat.id, f"{plasec_instance.answer}", f"{plasec_instance.token}")
+# Function to handle chat if no search results are found
+@bot.message_handler(commands=['image'])
+def image_command(message):
+    chat_text = message.text.replace("/image", "").strip()
+    if chat_text:
+        try:
+            # Instantiate Plasec with image generation action
+            d=PlasecImage.PlasecImage()
+            image_url = d.get_image(f"/imagine {chat_text}")
+            bot.send_photo(message.chat.id, image_url)  # Send image to user
+        except Exception as e:
+            bot.reply_to(message, f"Error generating image: {str(e)}")
+    else:
+               bot.reply_to(message, "Please provide a description for the image, e.g., /image mountain.")
+
+    
 def send_message_to_userid(user_id, message_text):
     try:
         bot.send_message(user_id, message_text)
@@ -484,19 +685,103 @@ def send_message_to_userid(user_id, message_text):
     except Exception as e:
         print(f"Error sending message to user {user_id}: {e}")
 # Modified handler to first perform a search, then fall back to chat if no results
+def get_random_credits(message=""):
+    import random
+    random_float = random.random() 
+    random_int = random.randint(1, 10)
+    return random_int
+# /play command to start the game
+
+@bot.message_handler(commands=['score'])
+def show_score(message):
+ global user_scores,user_name,score,allm,user_id
+ allm=message
+ 
+ markup = InlineKeyboardMarkup()
+
+
+ score=get_user_score(user_id)
+ bot.send_message(user_id, f"user plasec is:{score}")
+ autostarted=get_autopilot_status(user_id)
+ print("auto",autostarted)
+ if autostarted==1:
+         bot.send_message(message.chat.id, "با تشکر اتوپایوت به پایان رسید   ", reply_markup=markup)
+         set_autopilot_status(user_id,0,1)
+def read_link(url):
+   data=""
+   with urllib.request.urlopen(url) as response:
+         data = response.read().decode('utf-8')  # Read and decode the 
+   return data
+@bot.message_handler(commands=['play'])
+def play_game(message):
+    markup = InlineKeyboardMarkup()
+    try:
+        global allm, user_id
+        allm = message
+        user_ids = message.from_user.id
+
+        # Randomly assign points with weights
+        points = random.choices([1, 5, 10], weights=[70, 20, 10], k=1)[0]
+        deduct_credits(user_ids, -points)
+        update_user_score(user_ids, points)
+
+        # Determine the image URL based on points and description for the card
+        image_url = f"https://playandsecure.com/docs/card{points}.png?nocache={random.randint(1, 10000)}"
+        caption = f"You've earned {points} points!\n\n🃏 **Mission:** Upgrade your card by viewing ads!**"
+
+        # Create a link to the HTML page with the points as a query parameter
+        ads_page_url = f"https://www.playandsecure.com/plasec"
+        button = InlineKeyboardButton("Upgrade Card - View Ads", url=ads_page_url)
+        markup.add(button)
+
+        # Send the image with caption and button
+        bot.send_photo(
+            message.chat.id,
+            image_url,
+            caption=caption,
+            parse_mode='Markdown',
+            reply_markup=markup
+        )
+        autostarted=get_autopilot_status(user_id)
+        if autostarted:
+            bot.send_message(
+                message.chat.id,
+                "حالا با کردیتان با /chat از هوش مصنوعی جواب بگیرید 🧠 یا با /exit خارج شوید.",
+                reply_markup=markup
+            )
+
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Error 440: {str(e)}", reply_markup=markup)
+
+# Handler for clicking the logo
+@bot.callback_query_handler(func=lambda call: call.data == "click_logo")
+def handle_click(call):
+ 
+    points = random.choices([1, 5, 10], weights=[70, 20, 10], k=1)[0]
+    #update_user_score(user_id, points)
+    print("Cards",points)
+     
+    # Send the card image
+    with open('card'+points+'.png', 'rb') as photo:
+        bot.send_photo(user_id, photo, caption=f"You've earned {points} points! Keep playing to increase your score.")
+  
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
+   
     user_id = message.from_user.id
     text = message.text.strip()
 
     if text.startswith("/chat "):
         # First, attempt a search
+
         real_time_search(message, user_id, "chat")
+    #elif text.startswith("/play "):
+        # First, attempt a search
+        #real_time_search(message, user_id, "chat")
     elif  text.startswith("/send"):
        messages=text.split(" ")
        user=messages[1].strip()
-       user=108704602
-      
+    
        message=message.text.replace("/send","").strip()
        print("us",user,":",message)
        send_message_to_userid(user, text)
@@ -509,5 +794,6 @@ def handle_message(message):
 
 # Start bot polling
 if __name__ == '__main__':
-    initialize_db()
+    #initialize_db()
+    initialize_db_profile()
     bot.polling()
