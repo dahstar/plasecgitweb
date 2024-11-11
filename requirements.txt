@@ -3,3 +3,4 @@ metisai
 python-telegram-bot
 telebot
 django
+pydantic 
