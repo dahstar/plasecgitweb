@@ -17,11 +17,7 @@ COPY . .
 ENV DJANGO_SETTINGS_MODULE=mychatapp.settings
 ENV PYTHONUNBUFFERED 1
 
-# Collect static files (if needed for the app)
-RUN python manage.py collectstatic --noinput
-
 # Expose the Gunicorn port
 EXPOSE 8000
-RUN docker ps
 # Run the Gunicorn server
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "mychatapp.wsgi:application"]
