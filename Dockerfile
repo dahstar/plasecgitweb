@@ -12,9 +12,9 @@ RUN pip install -r ./requirements.txt
 
 ADD ./ ./
 
-ENTRYPOINT ["/bin/sh", "-c" , "python app.py  i"]
+ 
 
-ENTRYPOINT ["/bin/sh", "-c" , "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 django_app.wsgi"]
+ENTRYPOINT ["/bin/sh", "-c" , "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 mychatapp.wsgi"]
 
 
 
