@@ -1,37 +1,29 @@
-from django.shortcuts import render, redirect
-from sqlalchemy import create_engine, Table, Column, Integer, MetaData
-from sqlalchemy.orm import sessionmaker
+# views.py
+from django.shortcuts import render
 from django.http import JsonResponse
-
-# Set up SQLAlchemy connection
-engine = create_engine('sqlite:///profile.db')
-metadata = MetaData()
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# Define the user table
-users_table = Table(
-    'users', metadata,
-    Column('user_id', Integer, primary_key=True),
-    Column('credits', Integer)
-)
-
-# Ensure the table exists
-metadata.create_all(engine)
+from .models import User
 
 def main(request):
+    """Render the main page."""
     return render(request, 'main.html')
 
 def add_credit(request):
-    user_id = request.GET.get('user_id')
-    if user_id:
-        with engine.connect() as conn:
-            user = conn.execute(users_table.select().where(users_table.c.user_id == user_id)).first()
-            if user:
-                new_credits = user.credits + 100
-                conn.execute(users_table.update().where(users_table.c.user_id == user_id).values(credits=new_credits))
-                return JsonResponse({'status': 'success', 'new_credits': new_credits})
-            else:
-                return JsonResponse({'status': 'error', 'message': 'User not found'})
-    else:
+    """Add 100 credits to the specified user ID."""
+    user_id = request.GET.get('user_id')  # Get the user ID from the request parameters
+    
+    if not user_id:
+        # Return an error if the user_id parameter is missing
         return JsonResponse({'status': 'error', 'message': 'User ID not provided'})
+    
+    try:
+        # Try to find the user by user_id
+        user = User.objects.get(user_id=user_id)
+        # Increment the user's credits by 100
+        user.credits += 100
+        user.save()  # Save the updated user record in the database
+        
+        # Return success response with the updated credits
+        return JsonResponse({'status': 'success', 'new_credits': user.credits})
+    except User.DoesNotExist:
+        # Return an error if the user is not found
+        return JsonResponse({'status': 'error', 'message': 'User not found'})
