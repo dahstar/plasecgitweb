@@ -12,9 +12,8 @@ COPY profile.db .
 COPY train.db .
 COPY plasec.py .
 COPY . .
-RUN python create_db.py
 RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && \
     pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/ && \
     apt-get update  
 
-ENTRYPOINT ["/bin/bash", "-c", "gunicorn --bind 0.0.0.0:8000 django_app.wsgi"]
+ENTRYPOINT ["/bin/bash", "-c", "gunicorn --bind 0.0.0.0:8000 mychatapp.wsgi"]
