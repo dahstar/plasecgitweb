@@ -1,16 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-import logging
 
-# Set logging level for SageMaker
 
 def main():
     """Run administrative tasks."""
-    logging.getLogger('sagemaker').setLevel(logging.WARNING)
-
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mychatapp.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_app.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
