@@ -3,5 +3,8 @@ metisai
 python-telegram-bot
 telebot
 django
+pydantic
 gunicorn
+cohere
+langchain-cohere
 psycopg2
