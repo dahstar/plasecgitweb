@@ -49,7 +49,7 @@ SECRET_KEY = 'django-insecure-ewdqq+!9uo$u8!2u!9srrqqp$aq&3=u!03t682iq=j%9pm*@2^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['plasecweb.darkube.app']
 STATIC_URL = '/static/'
 
 
