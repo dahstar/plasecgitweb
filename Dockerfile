@@ -20,4 +20,4 @@ ENV PYTHONUNBUFFERED 1
 # Expose the Gunicorn port
 EXPOSE 8000
 # Run the Gunicorn server
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "mychatapp.wsgi:application"]
+RUN  gunicorn --bind 0.0.0.0:8000 mychatapp.wsgi:application
