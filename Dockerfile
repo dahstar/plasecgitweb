@@ -4,20 +4,18 @@ LABEL maintainer="admin@playandsecure.com"
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /
+WORKDIR /django_app/
 
-# Copy the requirements.txt file and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ADD ./requirements.txt ./
 
-# Copy the rest of the application code
-COPY . .
 
-# Set environment variables for Django
-ENV DJANGO_SETTINGS_MODULE=mychatapp.settings
-ENV PYTHONUNBUFFERED 1
+RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/
+ADD ./ ./
 
-# Expose the Gunicorn port
-EXPOSE 8000
-# Run the Gunicorn server
-RUN  gunicorn --bind 0.0.0.0:8000 mychatapp.wsgi:application
+ 
+
+ENTRYPOINT ["/bin/sh", "-c" , "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 mychatapp.wsgi"]
+
+
+
+ 
