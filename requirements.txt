@@ -6,3 +6,4 @@ django
 pydantic
 gunicorn
 cohere
+langchain-cohere
