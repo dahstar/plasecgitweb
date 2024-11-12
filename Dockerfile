@@ -4,12 +4,12 @@ LABEL maintainer="admin@playandsecure.com"
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /django_app/
+WORKDIR /
 
 ADD ./requirements.txt ./
 
+RUN pip install -r ./requirements.txt
 
-RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/
 ADD ./ ./
 
 ENTRYPOINT ["/bin/sh", "-c" , "python app.py  i"]
