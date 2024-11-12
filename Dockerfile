@@ -6,22 +6,11 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /
 
-# Copy the requirements.txt file and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code
 COPY . .
+RUN pip3 install --upgrade pip --index https://mirrors.aliyun.com/pypi/simple/ && \
+    pip3 install -r requirements.txt --index https://mirrors.aliyun.com/pypi/simple/ && \
+    apt-get update  
+docker ps
 
-# Set environment variables for Django
-ENV DJANGO_SETTINGS_MODULE=mychatapp.settings
-ENV PYTHONUNBUFFERED 1
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "mychatapp.wsgi:application"]
 
-# Collect static files (if needed for the app)
-RUN python manage.py collectstatic --noinput
-
-# Expose the Gunicorn port
-EXPOSE 8000
-
-# Run the Gunicorn server
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "mychatapp.wsgi:application"]
