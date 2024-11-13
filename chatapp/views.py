@@ -5,12 +5,16 @@ from django.shortcuts import render, redirect
 from chatapp.forms import ChatMessageForm
 from .models import ChatMessage
 from django.http import JsonResponse
+import requests
 
 from django.utils import timezone
 import cohere
 import getpass
 import os
 import sqlite3
+from .models import ChatMessage  # Assuming Message is the model for messages
+from django.views.decorators.csrf import csrf_exempt
+import requests
 
 from langchain_cohere import ChatCohere
 os.environ["COHERE_API_KEY"] = "oef7WXPGxfMecqTtsvR5OHaFORkxC9UqH9YGJPZn"
@@ -170,15 +174,43 @@ def chatwithllm(message, topic='default_topic', system='default_system'):
     except Exception as e:
         print(f"Error running script: {str(e)}")
         return f"Error running script: {str(e)}"
+@csrf_exempt
+def play_in_telegram(request):
+    if request.method == 'POST':
+        # Replace with your actual bot token and chat ID
+        bot_token = "YOUR_TELEGRAM_BOT_TOKEN_BETA"
+        chat_id = "YOUR_CHAT_ID"
+
+        # Send the /start command to the Telegram bot
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        data = {
+            'chat_id': chat_id,
+            'text': '/start'
+        }
+
+        response = requests.post(url, data=data)
+        
+        if response.status_code == 200:
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Failed to send command to Telegram'}, status=500)
        
 def search_messages(request):
     query = request.GET.get('q')
+    results =[]
     if query:
-        results = ChatMessage.objects.filter(content__icontains=query)
-        for message in results:
-            message.score += 1  # Increment score by 1 when message appears in search
+        # Filter messages that contain the query and are not empty
+        results = ChatMessage.objects.filter(content__icontains=query).exclude(content="")
+        s=[]
+        for x in results:
+            if x.message :
+               s.append(x)
+        # Increment score by 1 for each matching message
+        for message in s:
+            message.score += 1
             message.save()  # Save the updated message instance
-    return render(request, 'search_results.html', {'messages': results})
+
+    return render(request, 'search_results.html', {'messages': s})
 
 def message_clicked(request, message_id):
     try:
@@ -214,7 +246,16 @@ def run_hi_script():
         return result.stdout.strip()  # Return the output from the script
     except Exception as e:
         return f"Error running script: {str(e)}"
- 
+@csrf_exempt
+def delete_message(request, message_id):
+    if request.method == 'POST':
+        try:
+            message = ChatMessage.objects.get(id=message_id)
+            message.delete()
+            return JsonResponse({'status': 'success'})
+        except ChatMessage.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Message not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 def chat_view(request):
     global topic
     global system

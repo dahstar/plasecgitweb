@@ -52,49 +52,105 @@
             <button type="submit" class="btn btn-primary">Send</button>
         </form>
 
-        <hr>
-
+ 
         <!-- Messages -->
         <h3 class="text-center">Messages</h3>
         <div class="messages mt-4">
             {% for message in messages %}
-             <h3>Blockchain Data</h3>
-        <button onclick="fetchBlockchain()">message in Telgeram</button>
+    {% if message.message and "error" not in message.message.lower and  message.message != '' %}
+        <button id="playButton" class="btn btn-primary">Play in Telegram</button>
+        <hr>  
+
+        <script>
+            document.getElementById("playButton").addEventListener("click", function() {
+                fetch('/play_in_telegram/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Play command sent to Telegram!');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                });
+            });
+        </script>
+         
+
         <pre id="blockchainDisplay"></pre>
-                <div class="message" onclick="messageClicked('{{ message.id }}')">
-                    <strong>User:</strong> {{ message.message }}<br>
-                    <strong>Output:</strong> {{ message.response }}<br>
-                    <strong>Timestamp:</strong> {{ message.timestamp }}
- {% if message.topic != 'default_topic' %}
+        <div class="message" onclick="messageClicked('{{ message.id }}')">
+            <strong>User:</strong> {{ message.message }}<br>
+            <strong>Output:</strong> {{ message.response }}<br>
+            <strong>Timestamp:</strong> {{ message.timestamp }}
+            {% if message.topic != 'default_topic' %}
                 <br><strong>Topic:</strong> {{ message.topic }}
             {% endif %}
             
             {% if message.system != 'default_system' %}
                 <br><strong>System:</strong> {{ message.system }}
             {% endif %}
-              Plasec:{{ message.score }}
-          
-                </div>
-            {% endfor %}
+            Plasec: {{ message.score }}
+        </div>
+    {% endif %}
+{% endfor %}
         </div>
          
     </div>
 
     <script>
-        // Function to filter messages in real-time based on the search input
-      function searchMessages() {
-            let searchInput = document.getElementById("searchBar").value.toLowerCase();
-            let messages = document.getElementsByClassName("message");
-
-            Array.from(messages).forEach(function(message) {
-                let text = message.textContent.toLowerCase();
-                if (text.includes(searchInput)) {
-                    message.style.display = "";  // Show message
-                } else {
-                    message.style.display = "none";  // Hide message
-                }
-            });
+        function deleteMessage(messageId) {
+    fetch(`/delete_message/${messageId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',  // Ensure you include the CSRF token for Django
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Message deleted successfully!');
+            location.reload();  // Reload the page to update the message list
+        } else {
+            alert('Error deleting message: ' + data.message);
+        }
+    });
+}
+
+        // Function to filter messages in real-time based on the search input
+        document.addEventListener("DOMContentLoaded", function() {
+    const searchBar = document.getElementById("searchBar");
+
+    if (searchBar) {
+        searchBar.addEventListener("keyup", searchMessages);
+    } else {
+        console.error("Search bar element not found.");
+    }
+    
+    function searchMessages() {
+        let searchInput = searchBar.value.toLowerCase().trim();
+        let messages = document.getElementsByClassName("messages mt-4");
+
+        Array.from(messages).forEach(function(message) {
+            let text = message.textContent.toLowerCase().trim();
+
+            console.log("Message text:", text);  // Log the text of each message for debugging
+
+            // Show the message if it matches the search input, is not empty, and does not contain "blockchain data"
+            if (text.includes(searchInput) && text.length > 0 && text !== "blockchain data") {
+                message.style.display = "";  // Show message
+            } else {
+                message.style.display = "none";  // Hide message
+            }
+        });
+    }
+});
 
         function messageClicked(messageId) {
             fetch(`/message_clicked/${messageId}/`)

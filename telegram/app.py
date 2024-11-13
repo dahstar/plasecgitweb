@@ -516,7 +516,7 @@ def send_welcome(message): # type: ignore
     text+="نسخه دمو تک نفره)"
     text+="\\n"
          
-    bot.send_message(message.chat.id, f"waiting for chat by {message.from_user.username}...")
+    bot.send_message(message.chat.id, f"waiting for chat by {message.from_user.username} and {message.chat.id}...")
 
 
 # Function to show search results in a numbered format with truncated messages (up to 100 characters)
