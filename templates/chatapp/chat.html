@@ -63,6 +63,7 @@
 
         <script>
             document.getElementById("playButton").addEventListener("click", function() {
+                alert("clicked");
                 fetch('/play_in_telegram/', {
                     method: 'POST',
                     headers: {

@@ -179,7 +179,7 @@ def play_in_telegram(request):
     if request.method == 'POST':
         # Replace with your actual bot token and chat ID
         bot_token = "YOUR_TELEGRAM_BOT_TOKEN_BETA"
-        chat_id = "YOUR_CHAT_ID"
+        chat_id = "108704602"
 
         # Send the /start command to the Telegram bot
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
