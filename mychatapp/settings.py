@@ -50,6 +50,8 @@ SECRET_KEY = 'django-insecure-ewdqq+!9uo$u8!2u!9srrqqp$aq&3=u!03t682iq=j%9pm*@2^
 DEBUG = True
 
 ALLOWED_HOSTS = ['plasecweb.darkube.app','127.0.0.1']
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "https://plasecweb.darkube.app").split(",")
+
 STATIC_URL = '/static/'
 
 
