@@ -178,7 +178,7 @@ def chatwithllm(message, topic='default_topic', system='default_system'):
 def play_in_telegram(request):
     if request.method == 'POST':
         # Replace with your actual bot token and chat ID
-        bot_token = "TELEGRAM_BOT_TOKEN_BETA"
+        bot_token = os.getenv("TELEGRAM_BOT_TOKEN_BETA")
         chat_id = "108704602"
 
         # Send the /start command to the Telegram bot
