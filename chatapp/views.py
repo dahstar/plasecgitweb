@@ -21,7 +21,7 @@ from langchain_core.prompts import FewShotChatMessagePromptTemplate
 chat_model = ChatCohere()
 
 topic='default_topic' 
-API_KEY = 'oef7WXPGxfMecqTtsvR5OHaFORkxC9UqH9YGJPZn'
+API_KEY = os.getenv("COHERE_API_KEY")
 co = cohere.Client(API_KEY)
 
 system='default_system'
