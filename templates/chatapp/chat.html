@@ -60,6 +60,36 @@
                 {% if message.message and "error" not in message.message.lower and message.message != '' %}
                     <!-- Each Play button has a unique class and data attribute for identifying the message -->
                     <button class="playButton btn btn-primary" data-message-id="{{ 1943}}">Play in Telegram</button>
+                    <button id="triggerStartBtn">Send /start to Telegram</button>
+
+<script>
+     document.getElementById('triggerStartBtn').addEventListener('click', function() {
+        // Replace with the actual chat_id
+        const chat_id = 'USER_CHAT_ID'; 
+
+        fetch('/trigger_start/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF protection
+            },
+            body: `chat_id=${chat_id}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Message sent successfully! Message ID: ' + data.message_id + ', Text: ' + data.text);
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+            alert('Failed to send message');
+        });
+    });
+</script>
+
                     <hr>  
 
                     <pre id="blockchainDisplay"></pre>

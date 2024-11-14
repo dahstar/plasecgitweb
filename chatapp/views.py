@@ -15,6 +15,7 @@ import sqlite3
 from .models import ChatMessage  # Assuming Message is the model for messages
 from django.views.decorators.csrf import csrf_exempt
 import requests
+from telegram import Bot
 
 from langchain_cohere import ChatCohere
 os.environ["COHERE_API_KEY"] = "oef7WXPGxfMecqTtsvR5OHaFORkxC9UqH9YGJPZn"
@@ -27,7 +28,9 @@ chat_model = ChatCohere()
 topic='default_topic' 
 API_KEY = os.getenv("COHERE_API_KEY")
 co = cohere.Client(API_KEY)
-
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN_BETA')
+TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/'
+bot = Bot(token=TELEGRAM_BOT_TOKEN)
 system='default_system'
 texamples=[]
 def initialize_db():
@@ -174,6 +177,50 @@ def chatwithllm(message, topic='default_topic', system='default_system'):
     except Exception as e:
         print(f"Error running script: {str(e)}")
         return f"Error running script: {str(e)}"
+
+@csrf_exempt
+def trigger_start(request):
+    """
+    Endpoint to trigger a /start message in Telegram for a specific chat_id and return the response.
+    """
+    if request.method == 'POST':
+        try:
+            chat_id = request.POST.get('chat_id')
+
+            if not chat_id:
+                return JsonResponse({'status': 'error', 'message': 'chat_id is required'}, status=400)
+
+            # Send /start-like message
+            response = requests.post(
+                f"{TELEGRAM_API_URL}sendMessage",
+                data={
+                    'chat_id': chat_id,
+                    'text': 'Welcome! This is the start message triggered from the web.',
+                }
+            )
+
+            # Get the response JSON
+            response_data = response.json()
+
+            # Check if the message was sent successfully
+            if response_data['ok']:
+                message_id = response_data['result']['message_id']
+                text = response_data['result']['text']
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Start message sent successfully!',
+                    'message_id': message_id,
+                    'text': text
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Failed to send message. Telegram API error.'
+                })
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 @csrf_exempt
 def play_in_telegram(request):
     if request.method == 'POST':
