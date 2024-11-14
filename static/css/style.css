@@ -20,3 +20,28 @@ body.dark-theme {
 
     border: none;
 }
+/* ChatGPT dark theme button styling */
+.playButton btn btn-primary {
+    background-color: #3f3f46; /* Dark gray background for button */
+    color: #703535; /* Light gray text color */
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px; /* Rounded corners for a modern look */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+.button:hover {
+    background-color: #575767; /* Darker gray on hover */
+}
+
+.button:active {
+    background-color: #404040; /* Slightly different shade on click */
+}
+
+.button-container {
+    text-align: center;
+    margin: 10px 0;
+}

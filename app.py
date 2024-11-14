@@ -1,26 +1,32 @@
-import telebot
-import os
+import requests
 
-# Initialize bot with the token from environment variable
-bot = telebot.TeleBot(os.getenv('TELEGRAM_BOT_TOKEN_BETA'))
+# Your bot token and chat ID
+bot_token = '7894875635:AAH7pltCXarg0r2Wib6Sf49QBUBbj0Ky4tc'  # Replace with your bot's token
+chat_id = '108704602'  # Replace with the chat ID where the message is sent
 
-# Handler for the /start command
-@bot.message_handler(commands=['start'])
-def handle_start(message):
-    # Get the message_id of the /start message
-    start_message_id = message.message_id
-    chat_id = message.chat.id  # Chat ID where the message was sent
+# Send the /start message
+message = "/start"
 
-    # Respond with the message ID information or process as needed
-    bot.send_message(chat_id, f"Welcome! Your /start message ID is: {start_message_id}")
-@bot.message_handler(commands=['play'])
-def handle_start(message):
-    # Get the message_id of the /start message
-    start_message_id = message.message_id
-    chat_id = message.chat.id  # Chat ID where the message was sent
+# Telegram API URL to send the message
+url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
 
-    # Respond with the message ID information or process as needed
-    bot.send_message(chat_id, f"Welcome! Your /play message ID is: {start_message_id}")
+# Prepare the data to send
+payload = {
+    'chat_id': chat_id,
+    'text': message
+}
 
-# Start polling
-bot.infinity_polling()
+# Send the message using POST request
+response = requests.post(url, data=payload)
+
+# Parse the response from Telegram API
+response_data = response.json()
+
+# Check if the request was successful
+if response_data['ok']:
+    # Print the response data (including the message sent by the bot)
+    print(f"Message ID: {response_data['result']['message_id']}")
+    print(f"Text: {response_data['result']['text']}")
+    print(f"Response from Bot: {response_data['result']['text']}")
+else:
+    print("Failed to send message:", response_data)

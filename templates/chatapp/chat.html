@@ -34,6 +34,32 @@
             border: 1px solid #444;
             color: white;
         }
+        /* ChatGPT dark theme button styling */
+.button {
+    background-color: #3f3f46; /* Dark gray background for button */
+    color: #e5e5e5; /* Light gray text color */
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px; /* Rounded corners for a modern look */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+.button:hover {
+    background-color: #575767; /* Darker gray on hover */
+}
+
+.button:active {
+    background-color: #404040; /* Slightly different shade on click */
+}
+
+.button-container {
+    text-align: center;
+    margin: 10px 0;
+}
+
     </style>
 </head>
 <body class="dark-theme">
@@ -60,33 +86,42 @@
                 {% if message.message and "error" not in message.message.lower and message.message != '' %}
                     <!-- Each Play button has a unique class and data attribute for identifying the message -->
                     <button class="playButton btn btn-primary" data-message-id="{{ 1943}}">Play in Telegram</button>
-                    <button id="triggerStartBtn">Send /start to Telegram</button>
-
+                    <button class="playButton btn btn-primary" data-message-id="{{ 1943}}">Share in Telegram</button>
+ 
 <script>
-     document.getElementById('triggerStartBtn').addEventListener('click', function() {
-        // Replace with the actual chat_id
-        const chat_id = 'USER_CHAT_ID'; 
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the Play and Share buttons by their IDs
+        const playButton = document.getElementById("playButton");
+        const shareButton = document.getElementById("shareButton");
 
-        fetch('/trigger_start/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF protection
-            },
-            body: `chat_id=${chat_id}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert('Message sent successfully! Message ID: ' + data.message_id + ', Text: ' + data.text);
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error sending message:', error);
-            alert('Failed to send message');
+        // Add click event listener to the Play button
+        playButton.addEventListener("click", function() {
+            const messageId = this.getAttribute("data-message-id");
+            // Disable button temporarily and show "Sending..." text
+            alert("t"+playButton.textContent)
+            playButton.disabled = true;
+            playButton.textContent = "Sending...";
+
+            fetch('/play_in_telegram/start', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "message_id": messageId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.status === 'success' ? 'Play command sent to Telegram!' : 'Error: ' + data.message);
+            })
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                playButton.disabled = false;
+                playButton.textContent = "Play in Telegram";
+            });
         });
+
+        
     });
 </script>
 
@@ -114,7 +149,44 @@
         // Select all buttons with the "playButton" class and add event listeners to each
         document.addEventListener("DOMContentLoaded", function() {
             const playButtons = document.querySelectorAll(".playButton");
+            const startButtons = document.querySelectorAll(".startButton");
 
+            startButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const startButton = this;
+                    const messageId = startButton.getAttribute("data-message-id");
+
+                    if (!startButtondisabled) {
+                        startButton.disabled = true;  // Disable the button to prevent multiple clicks
+                        startButton.textContent = "Sending...";  // Optional: show sending status
+
+                        fetch('/play_in_telegram/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ "message_id": messageId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                alert('Play command sent to Telegram!');
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while sending the command.');
+                        })
+                        .finally(() => {
+                            startButton.disabled = false;  // Re-enable the button after the action completes
+                            startButton.textContent = "Play in Telegram";  // Reset button text
+                        });
+                    }
+                });
+            });
             playButtons.forEach(button => {
                 button.addEventListener("click", function() {
                     const playButton = this;
