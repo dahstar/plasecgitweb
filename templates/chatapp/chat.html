@@ -63,23 +63,33 @@
 
         <script>
             document.getElementById("playButton").addEventListener("click", function() {
-                alert("clicked");
-                fetch('/play_in_telegram/', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Play command sent to Telegram!');
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                });
+                const playButton = document.getElementById("playButton");
+        
+                if (!playButton.disabled) {
+                    playButton.disabled = true;  // Disable the button after the first click
+                    playButton.textContent = "Sending...";  // Optional: change button text to show it's processing
+        
+                    fetch('/play_in_telegram/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert('Play command sent to Telegram!');
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .finally(() => {
+                        playButton.disabled = false;  // Re-enable the button after the action completes
+                        playButton.textContent = "Play in Telegram";  // Reset button text
+                    });
+                }
             });
         </script>
          
