@@ -221,27 +221,31 @@ def trigger_start(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+ 
 @csrf_exempt
-def play_in_telegram(request):
-    if request.method == 'POST':
-        # Replace with your actual bot token and chat ID
-        bot_token = os.getenv("TELEGRAM_BOT_TOKEN_BETA")
-        chat_id = "108704602"
+def play_in_telegram(request, message_id):
+    # Example message content based on message_id
+   
+    message_content = f" {message_id}"
 
-        # Send the /start command to the Telegram bot
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        data = {
-            'chat_id': chat_id,
-            'text': '/start'
-        }
+    # Send the message to Telegram
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": 108704602,
+        "text": message_content.replace("$$$underlineplay","/play"),
+    }
 
-        response = requests.post(url, data=data)
-        
-        if response.status_code == 200:
-            return JsonResponse({'status': 'success'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Failed to send command to Telegram'}, status=500)
-       
+    response = requests.post(url, json=payload)
+
+    if response.status_code == 200:
+        message_content=""
+        return JsonResponse({"status": "success", "message": "Message sent to Telegram!"})
+    else:
+        return JsonResponse({
+            "status": "error",
+            "message": "Failed to send message to Telegram",
+            "details": response.json()
+        })
 def search_messages(request):
     query = request.GET.get('q')
     results =[]
@@ -264,8 +268,10 @@ def message_clicked(request, message_id):
         message = ChatMessage.objects.get(id=message_id)
         message.score += 10  # Increment score by 10 when clicked
         message.save()  # Save the updated message instance
+
         return JsonResponse({'status': 'success', 'new_score': message.score})
     except ChatMessage.DoesNotExist:
+        
         return JsonResponse({'status': 'error', 'message': 'Message not found'})
 def run_cal_script(a, b, op):
     """
