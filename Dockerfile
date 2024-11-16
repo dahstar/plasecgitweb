@@ -14,7 +14,7 @@ ADD ./ ./
 
  
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["supervisord", "-c", "/supervisord.conf"]
 
 
 
