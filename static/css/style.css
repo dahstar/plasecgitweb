@@ -36,7 +36,31 @@ body.dark-theme {
 .button:hover {
     background-color: #575767; /* Darker gray on hover */
 }
+.custom-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280; /* Text color */
+    background-color: transparent; /* Transparent background for base state */
+    border: 1px solid transparent;
+    border-radius: 6px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    cursor: pointer;
+}
 
+.custom-button:hover {
+    color: #10b981; /* Change text color on hover (green) */
+    background-color: #1f2937; /* Subtle background on hover */
+    border: 1px solid #10b981; /* Add border on hover */
+}
+
+.custom-button:active {
+    background-color: #374151; /* Slightly darker background on click */
+    color: #ffffff; /* White text on click */
+}
 .button:active {
     background-color: #404040; /* Slightly different shade on click */
 }
@@ -44,4 +68,34 @@ body.dark-theme {
 .button-container {
     text-align: center;
     margin: 10px 0;
+}
+
+.button-container {
+    text-align: center;
+    margin: 10px 0;
+}
+.playButton btn btn-primary{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280; /* Text color */
+    background-color: transparent; /* Transparent background for base state */
+    border: 1px solid transparent;
+    border-radius: 6px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    cursor: pointer;
+}
+
+.playButton btn btn-primary:hover {
+    color: #10b981; /* Change text color on hover (green) */
+    background-color: #1f2937; /* Subtle background on hover */
+    border: 1px solid #10b981; /* Add border on hover */
+}
+
+.playButton btn btn-primary:active {
+    background-color: #374151; /* Slightly darker background on click */
+    color: #ffffff; /* White text on click */
 }

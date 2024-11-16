@@ -365,7 +365,7 @@ def chat_view(request):
                    answer = parts[1].strip()
                    q_type = parts[2].strip() if len(parts) > 2 else 'general'  # Default type is 'general'
                    system_message = parts[3].strip() if len(parts) > 3 else 'default_system'
-                   # Add the new question to the database
+                   
                    addexaample(question, answer, q_type, system_message)
                    result = f"Question '{question}' with type '{q_type}' added."
                   except Exception as e:
@@ -405,7 +405,8 @@ def chat_view(request):
                     result = "System is " + system
                 
                 else:
-                    result = "Command not recognized."
+                   
+                   result=chatwithllm(user_message,topic,system)
 
             except Exception as e:
                 result = f"Error: {str(e)}"
