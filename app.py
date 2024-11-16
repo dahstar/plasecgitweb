@@ -1,7 +1,7 @@
 import os
 import telebot
 import requests
-
+import PlasecImage  
 # Initialize the bot with your token
 bot_token = os.getenv('TELEGRAM_BOT_TOKEN_BETA')  # Replace with your bot's token
 bot = telebot.TeleBot(bot_token)
@@ -34,7 +34,7 @@ def handle_play(message):
         chat_id = message.chat.id
 
         # Debug information
-        print(f"Received /play command in chat {chat_id} with message_id {play_message_id}")
+        print(f"Received /plays command in chat {chat_id} with message_id {play_message_id}")
 
         # Respond to the user
         bot.send_message(chat_id, f"Let’s play! Your /play message ID is: {play_message_id}")
