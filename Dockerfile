@@ -12,7 +12,8 @@ RUN pip install -r ./requirements.txt
 
 ADD ./ ./
 
-ENTRYPOINT ["/bin/sh", "-c" , "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 mychatapp.wsgi && python telegram/app.py"]
+ENTRYPOINT ["/entrypoint.sh"]
+
 
 
 
