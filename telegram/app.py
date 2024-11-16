@@ -61,7 +61,7 @@ def send_message_via_api(chat_id, message):
 
         if response_data['ok']:
             print(f"Message sent successfully! Message ID: {response_data['result']['message_id']}")
-            return response_data['result']['message_id']
+            return "success"
         else:
             print("Failed to send message:", response_data)
     except Exception as e:

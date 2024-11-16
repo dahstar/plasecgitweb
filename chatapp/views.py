@@ -225,13 +225,13 @@ def trigger_start(request):
 @csrf_exempt
 def play_in_telegram(request, message_id):
     # Example message content based on message_id
-   
+    messageId=108704602
     message_content = f" {message_id}"
 
     # Send the message to Telegram
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
-        "chat_id": 108704602,
+        "chat_id": messageId,
         "text": message_content.replace("$$$underlineplay","/play"),
     }
 
@@ -239,7 +239,9 @@ def play_in_telegram(request, message_id):
 
     if response.status_code == 200:
         message_content=""
-        return JsonResponse({"status": "success", "message": "Message sent to Telegram!"})
+        return render(request, 'chatapp/play_in_telegram.html', {'message_id': messageId})
+
+
     else:
         return JsonResponse({
             "status": "error",
