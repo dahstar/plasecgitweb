@@ -14,6 +14,8 @@ import requests
 from requests.exceptions import ConnectionError
 import random
 import urllib.request
+import subprocess
+import PlasecImage 
 allm=None
 USER_DB_PATH="profile.db"
 # Dictionary to track each user's current autopilot step
@@ -23,7 +25,6 @@ user_modes = {}
 user_search_results = {}
 
 username=""
-import PlasecImage
 
 # Initialize Telegram bot with your API Token
 # Initialize bot with token (set your own token)
@@ -481,19 +482,28 @@ def callback_query(call):
 
 def chatwithllm(message, topic='default_topic', system='default_system'):
     """
-    Run the plasec.py script with the given arguments and system prompt.
+    Handles both chat and image generation based on the command provided.
     """
     try:
-        
+        if message.startswith("/image "):  # Detect the /image command
+            # Extract the prompt from the message
+            prompt = message[len("/image "):].strip()
 
-        # Run plasec.py with the message, topic, and system prompt
-        result = subprocess.run(
-            ['python3', 'plasec.py', message, topic, system],
-            capture_output=True,
-            text=True
-        )
+            # Use PlasecImage to generate an image
+            plasec_image = PlasecImage()
+            image_url = plasec_image.get_image(prompt)
 
-        return result.stdout.strip()  # Return the output from the script
+            # Return the image URL or an error message if generation fails
+            return image_url if image_url else "Error: Unable to generate the image."
+        else:
+            # For normal chat functionality, run plasec.py with the given arguments
+            result = subprocess.run(
+                ['python3', 'scripts/plasec.py', message, topic, system],
+                capture_output=True,
+                text=True
+            )
+
+            return result.stdout.strip()  # Return the output from the script
     except Exception as e:
         print(f"Error running script: {str(e)}")
         return f"Error running script: {str(e)}"
