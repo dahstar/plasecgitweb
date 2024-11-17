@@ -482,28 +482,19 @@ def callback_query(call):
 
 def chatwithllm(message, topic='default_topic', system='default_system'):
     """
-    Handles both chat and image generation based on the command provided.
+    Run the plasec.py script with the given arguments and system prompt.
     """
     try:
-        if message.startswith("/image "):  # Detect the /image command
-            # Extract the prompt from the message
-            prompt = message[len("/image "):].strip()
+        
 
-            # Use PlasecImage to generate an image
-            plasec_image = PlasecImage()
-            image_url = plasec_image.get_image(prompt)
+        # Run plasec.py with the message, topic, and system prompt
+        result = subprocess.run(
+            ['python3', 'scripts/plasec.py', message, topic, system],
+            capture_output=True,
+            text=True
+        )
 
-            # Return the image URL or an error message if generation fails
-            return image_url if image_url else "Error: Unable to generate the image."
-        else:
-            # For normal chat functionality, run plasec.py with the given arguments
-            result = subprocess.run(
-                ['python3', 'scripts/plasec.py', message, topic, system],
-                capture_output=True,
-                text=True
-            )
-
-            return result.stdout.strip()  # Return the output from the script
+        return result.stdout.strip()  # Return the output from the script
     except Exception as e:
         print(f"Error running script: {str(e)}")
         return f"Error running script: {str(e)}"
