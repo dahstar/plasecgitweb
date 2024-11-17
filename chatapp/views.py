@@ -30,7 +30,7 @@ chat_model = ChatCohere()
 topic='default_topic' 
 API_KEY = os.getenv("COHERE_API_KEY")
 co = cohere.Client(API_KEY)
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN_BETA')
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/'
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 system='default_system'

@@ -314,16 +314,14 @@ document.addEventListener("DOMContentLoaded", function() {
     playButtons.forEach(button => {
         button.addEventListener("click", function() {
             textcontent="click $$$underlineplay"
-            
+            url=os.getenv("a")
             messageId=button.getAttribute("data-message-id")
        if(messageId==1)
          textcontent= document.getElementById("respond").innerHTML
-            messageId=textcontent
-            window.location.href ='https://plasecweb.darkube.app/play_in_telegram/'+messageId+'/';
- // Redirect back to the home page after 3 seconds
- setTimeout(function() {
-            window.location.href = 'https://plasecweb.darkube.app/';  // Replace '/' with your desired URL
-        }, 3000);
+            messageId=textcontent;
+            home_url=os.getenv("home_url");
+            window.location.href =f'{home_url}/play_in_telegram/'+messageId+'/';
+
         });
     });
  
