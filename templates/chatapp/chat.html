@@ -364,11 +364,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const imageButton = document.getElementById("imagePrompt");
     const form = document.getElementById("imageForm");
     const messageInput = document.getElementById("messageInput");
-
-    
+    imageButton.addEventListener("click", function (e) {
+            e.preventDefault(); // Prevent form from submitting immediately
+            const inputValue = messageInput.value.trim();
+            if (inputValue !== "") {
+                // Prefix the input with the `/image` command
                 messageInput.value = "/image " + inputValue;
-               
+                form.submit();
+            }
     
+               
+        });
 });
         
     </script>
