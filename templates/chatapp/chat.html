@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Search bar element not found.");
     }
     const searchToggle = document.getElementById("searchToggle");
- 
+    searchBar.style.display = "none";
     searchToggle.addEventListener("click", function() {
         if (searchBar.style.display === "none" || searchBar.style.display === "") {
             searchBar.style.display = "block";
@@ -310,20 +310,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
        
-  
     playButtons.forEach(button => {
         button.addEventListener("click", function() {
             textcontent="click $$$underlineplay"
-            url=os.getenv("a")
+            url="https://plasecweb.darkube.app/"
             messageId=button.getAttribute("data-message-id")
        if(messageId==1)
          textcontent= document.getElementById("respond").innerHTML
             messageId=textcontent;
-            home_url=os.getenv("home_url");
-            window.location.href =f'{home_url}/play_in_telegram/'+messageId+'/';
-
+            home_url="https://plasecweb.darkube.app"
+            window.location.href =home_url+"/play_in_telegram/"+messageId
+              
         });
     });
+  
  
 });
 
