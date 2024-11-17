@@ -279,9 +279,9 @@ class Plasec:
 
 if __name__ == "__main__":
     try:
-        chat = sys.argv[1]
-        topic = sys.argv[2]
-        system = sys.argv[3]
+        chat =  input("chat")
+        topic =  input("topic")
+        system = input("system")
         plasec_instance = Plasec(chat, topic, system)
         print(plasec_instance.answer)
     except Exception as e:

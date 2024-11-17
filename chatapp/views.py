@@ -171,7 +171,7 @@ def chatwithllm(message, topic='default_topic', system='default_system'):
             prompt = message[len("/image "):].strip()
 
             # Use PlasecImage to generate an image
-            plasec_image = PlasecImage()
+            plasec_image = PlasecImage.PlasecImage()
             image_url = plasec_image.get_image(prompt)
 
             # Return the image URL or an error message if generation fails
