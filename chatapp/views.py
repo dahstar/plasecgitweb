@@ -16,7 +16,8 @@ from .models import ChatMessage  # Assuming Message is the model for messages
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from telegram import Bot
-import PlasecImage
+from PlasecImage import PlasecImage
+
 import subprocess
 from langchain_cohere import ChatCohere
 os.environ["COHERE_API_KEY"] = "oef7WXPGxfMecqTtsvR5OHaFORkxC9UqH9YGJPZn"
@@ -171,9 +172,11 @@ def chatwithllm(message, topic='default_topic', system='default_system'):
             prompt = message[len("/image "):].strip()
 
             # Use PlasecImage to generate an image
-            plasec_image = PlasecImage.PlasecImage()
-            image_url = plasec_image.get_image(prompt)
-
+            plasec_image = PlasecImage()
+            
+            image_url = plasec_image.get_prompt(prompt)
+           
+            
             # Return the image URL or an error message if generation fails
             return image_url if image_url else "Error: Unable to generate the image."
         else:

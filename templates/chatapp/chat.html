@@ -205,7 +205,8 @@
                 <textarea onkeyup="searchMessages()" id="messageInput" name="message" class="form-control" placeholder="Type your message here..." rows="3" width="100%"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Send</button>
-            <button type="submit"  id="imagePrompt" class="btn btn-primary">Image</button>
+            <button type="button" id="imagePrompt" class="btn btn-primary">Image</button>
+
 
         </form>
 
@@ -223,7 +224,11 @@
                     <pre id="blockchainDisplay"></pre>
                     <div class="message" onclick="messageClicked('{{ message.id }}')">
                         <strong>User:</strong> {{ message.message }}<br>
-                        <strong>Output:</strong><div id="respond">{{ message.response }}</div> <br>
+                        <strong>Output:</strong><div id="respond">{% if message.response|slice:"0:4" == "http"    %}
+                            <img src="{{ message.response }}" alt="Generated Image" style="max-width: 100%; height: auto;">
+                        {% else %}
+                            {{ message.response }}
+                        {% endif %}</div> <br>
                         <strong>Timestamp:</strong> {{ message.timestamp }}
                         {% if message.topic != 'default_topic' %}
                             <br><strong>Topic:</strong> {{ message.topic }}
@@ -355,18 +360,16 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 });
         }
-        document.getElementById('imageButton').addEventListener('click', function() {
-    const imageInput = document.getElementById('imagePrompt');
-    const form = document.getElementById('imageForm');
+        document.addEventListener("DOMContentLoaded", function () {
+    const imageButton = document.getElementById("imagePrompt");
+    const form = document.getElementById("imageForm");
+    const messageInput = document.getElementById("messageInput");
 
-    if (imageInput.value.trim() !== "") {
-      // Prefix the input with the `/image` command
-      imageInput.value = "/image " + imageInput.value.trim();
-      form.submit();
-    } else {
-      alert("Please enter a description!");
-    }
-  });
+    
+                messageInput.value = "/image " + inputValue;
+               
+    
+});
         
     </script>
     <div id="pos-article-display-102291"></div>
