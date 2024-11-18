@@ -330,16 +330,33 @@ document.addEventListener("DOMContentLoaded", function() {
   
  
 });
-document.body.addEventListener("click", function (e) {
-    if (e.target && e.target.classList.contains("playButton")) {
-        const button = e.target;
+playButtons.forEach(button => {
+    button.addEventListener("click", function () {
+        // Get the message ID from the data attribute of the clicked button
         const messageId = button.getAttribute("data-message-id");
-        const messageContent = document.getElementById("respond")?.textContent.trim();
-        const url = `https://plasecweb.darkube.app/play_in_telegram/${encodeURIComponent(messageContent)}`;
-        window.location.href = url;
+
+        // Find the corresponding message content dynamically
+        const messageElement = button.closest(".message"); // Get the closest parent with the "message" class
+        let textcontent = "click $$$underlineplay";
+
+        if (messageElement) {
+            // Find the `respond` div within this specific message
+            const respondElement = messageElement.querySelector("#respond");
+            if (respondElement) {
+                textcontent = respondElement.innerHTML.trim();
+            }
+        }
+
+        // Replace slashes for encoding
+        const encodedContent = textcontent.replace("/", "$$$underline");
+        const home_url = "https://plasecweb.darkube.app";
+
+        // Redirect to the URL with the proper message ID and encoded content
+        window.location.href = `${home_url}/play_in_telegram/${messageId}`;
         alert("Message shared!");
-    }
+    });
 });
+
 
         function deleteMessage(messageId) {
             fetch(`/delete_message/${messageId}/`, {

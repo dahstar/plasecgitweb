@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from telegram import Bot
 from PlasecImage import PlasecImage
+import webbrowser
 
 import subprocess
 from langchain_cohere import ChatCohere
@@ -250,8 +251,12 @@ def play_in_telegram(request, message_id):
     }
 
     response = requests.post(url, json=payload)
-
+        
     if response.status_code == 200:
+        bot_url = "https://t.me/plasec_bot"
+
+        # Open the bot's URL in the default web browser
+        webbrowser.open(bot_url) 
         message_content=""
         return render(request, 'chatapp/play_in_telegram.html', {'message_id': messageId})
 
@@ -262,6 +267,7 @@ def play_in_telegram(request, message_id):
             "message": "Failed to send message to Telegram",
             "details": response.json()
         })
+   
 def search_messages(request):
     query = request.GET.get('q')
     results =[]
@@ -283,8 +289,10 @@ def message_clicked(request, message_id):
     try:
         message = ChatMessage.objects.get(id=message_id)
         message.score += 10  # Increment score by 10 when clicked
+         
         message.save()  # Save the updated message instance
-
+        play_in_telegram(request,message.response)
+     
         return JsonResponse({'status': 'success', 'new_score': message.score})
     except ChatMessage.DoesNotExist:
         
