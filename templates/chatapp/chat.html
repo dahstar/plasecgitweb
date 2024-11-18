@@ -225,7 +225,7 @@
                 <textarea onkeyup="searchMessages()" id="messageInput" name="message" class="form-control" placeholder="Type your message here..." rows="3" width="100%"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Send</button>
-            <button type="button" id="imagePrompt" class="btn btn-primary" onclick="sendimage()">Image</button>
+            <button type="button" id="imagePrompt" class="btn btn-primary" >Image</button>
 
 
         </form>
@@ -299,11 +299,23 @@
         /// Select all buttons with the "playButton" class and add event listeners to each
 document.addEventListener("DOMContentLoaded", function() {
     
-    const playButtons = document.querySelectorAll(".playButton");
-    const startButtons = document.querySelectorAll(".startButton");
+     const startButtons = document.querySelectorAll(".startButton");
     const searchBar = document.getElementById("searchBar");
     searchBar.style.display = "none";
-   
+    imageButton.addEventListener("click", function (e) {
+            e.preventDefault(); // Prevent form from submitting immediately
+            const inputValue = messageInput.value.trim();
+            if (inputValue !== "") {
+                 
+
+                // Prefix the input with the `/image` command
+                form = document.getElementById("imageForm");
+                messageInput.value = "/image " + inputValue;
+                form.submit();
+            }
+    
+               
+        });
     if (searchBar) {
         searchBar.addEventListener("keyup", searchMessages);
     } else {
