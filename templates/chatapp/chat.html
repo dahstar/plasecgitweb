@@ -332,13 +332,13 @@ document.addEventListener("DOMContentLoaded", function() {
             textcontent="click $$$underlineplay"
             url="https://plasecweb.darkube.app/"
             messageId=button.getAttribute("data-message-id")
-       if(button.textContent=="Share")
+       if(messageId==1)
          textcontent= document.getElementById("respond").innerHTML
             messageId=textcontent;
             textContent=textcontent.replace("/","$$$underline")
             home_url="https://plasecweb.darkube.app"
             window.location.href =home_url+"/play_in_telegram/"+messageId
-              
+            alert("share")
         });
     });
   
