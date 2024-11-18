@@ -283,6 +283,8 @@ if __name__ == "__main__":
         topic =  input("topic")
         system = input("system")
         plasec_instance = Plasec(chat, topic, system)
+        if "Error:" in plasec_instance.answer:
+             plasec_instance.answer=plasec_instance.get_metis1(chat)
         print(plasec_instance.answer)
     except Exception as e:
         print(f"Error in model: {str(e)}")
