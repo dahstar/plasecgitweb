@@ -246,7 +246,7 @@ def play_in_telegram(request, message_id):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": messageId,
-        "text": message_content.replace("$$$underlineplay","/play"),
+        "text": message_content.replace("$$$underline","/"),
     }
 
     response = requests.post(url, json=payload)
