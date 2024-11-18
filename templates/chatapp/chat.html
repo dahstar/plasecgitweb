@@ -57,21 +57,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease; /* Smooth hover transition */
 }
-#searchToggle{
-     padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-     cursor: pointer;
-    
-     background-color: #1f2937; /* Subtle background on hover */
-    padding: 8px 16px; /* Reduce padding for smaller screens */
-        font-size: 12px; /* Smaller font size for better fit */
-        border-radius: 4px; /* Slightly smaller rounded corners */
-         color: #10b981; /* Change text color on hover (green) */
-     border: 1px solid #10b981; /* Add border on hover */
-         color: #10b981; /* Change text color on hover (green) */
-         border-color: 12px;
-}
+
 
 .button:hover {
     background-color: #575767; /* Darker gray on hover */
@@ -114,7 +100,28 @@
     transition: all 0.3s ease; /* Smooth transition for hover effects */
     cursor: pointer;
 }
-
+#searchToggle
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280; /* Text color */
+    background-color: transparent; /* Transparent background for base state */
+    border: 2px solid #050505;
+    border-radius: 6px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    cursor: pointer;
+    border-color: #050505;
+}
+#searchToggle:hover
+{
+    color: #f9fdfc; /* Change text color on hover (green) */
+    background-color: #1f2937; /* Subtle background on hover */
+    border: 4px solid #10b981; /* Add border on hover */
+}
 .custom-button:hover {
     color: #10b981; /* Change text color on hover (green) */
     background-color: #1f2937; /* Subtle background on hover */
@@ -150,12 +157,21 @@
     .btn-primary {
         padding: 8px 16px; /* Reduce padding for smaller screens */
         font-size: 12px; /* Smaller font size for better fit */
-        border-radius: 4px; /* Slightly smaller rounded corners */
+        border-radius: 2px; /* Slightly smaller rounded corners */
          color: #10b981; /* Change text color on hover (green) */
     background-color: #1f2937; /* Subtle background on hover */
     border: 1px solid #10b981; /* Add border on hover */
     }
+    #searchToggle
+{
+    padding: 8px 16px; /* Reduce padding for smaller screens */
+        font-size: 12px; /* Smaller font size for better fit */
+        border-radius: 2px; /* Slightly smaller rounded corners */
+         color: #10b981; /* Change text color on hover (green) */
+    background-color: #1f2937; /* Subtle background on hover */
+    border: 1px solid #10b981; /* Add border on hover */
 }
+
 .btn-primary:hover {
     color: #10b981; /* Change text color on hover (green) */
     background-color: #1f2937; /* Subtle background on hover */
@@ -165,6 +181,7 @@
 .btn-primary:active {
     background-color: #374151; /* Slightly darker background on click */
     color: #ffffff; /* White text on click */
+}
 }
 
  
