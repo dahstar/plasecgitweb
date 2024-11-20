@@ -281,7 +281,8 @@
         let messageInput = searchBar.value.toLowerCase().trim();
         let messages = document.getElementsByClassName("messages mt-4");
         searchBar = document.getElementById("searchBar");
- 
+        const imageButton = document.getElementById("imagePrompt");
+
         
         Array.from(messages).forEach(function(message) {
             let text = message.textContent.toLowerCase().trim();
@@ -302,6 +303,7 @@ document.addEventListener("DOMContentLoaded", function() {
      const startButtons = document.querySelectorAll(".startButton");
     const searchBar = document.getElementById("searchBar");
     searchBar.style.display = "none";
+    imageButton=document.getElementById("searchBar");
     imageButton.addEventListener("click", function (e) {
             e.preventDefault(); // Prevent form from submitting immediately
             const inputValue = messageInput.value.trim();
